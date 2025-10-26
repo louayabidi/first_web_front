@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./Facades.css";
 
-const generateId = () => "_" + Math.random().toString(36).substr(2, 9);
+
 
 function GalleryCard({ images, onDelete }) {
   const [index, setIndex] = useState(0);

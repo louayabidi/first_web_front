@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaTrash } from "react-icons/fa";
+
 import "./profesionnel.css";
 
 function GalleryCard({ images, onDelete }) {

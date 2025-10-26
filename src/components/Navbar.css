@@ -1,40 +1,41 @@
 .navbar {
   display: flex;
-  align-items: center; /* Vertically center items */
+  align-items: center;
   justify-content: space-between;
-  padding: 8px 30px; /* Slightly smaller padding */
-  background-color:#FFF9;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 8px 30px;
+  background-color: #FFF9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-bottom: 2px solid #4B6382;
-  overflow: hidden; /* pour ne pas que le motif dépasse */
   position: relative;
+  z-index: 10; /* Ensure navbar is above other content */
 }
+
 .navbar::before {
   content: "";
   position: absolute;
-  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  inset: 0;
   background:
     repeating-radial-gradient(circle at 10% 10%, rgba(200, 200, 255, 0.05), transparent 30px),
     repeating-linear-gradient(60deg, rgba(255, 214, 179, 0.03), transparent 20px);
-  z-index: 0; /* derrière le contenu */
+  z-index: 0;
   pointer-events: none;
 }
 
 .aulogo {
-  position: relative;
-  height:70px;
+  height: 70px;
   width: auto;
   object-fit: contain;
   margin-right: 12px;
   color: #071739;
-  opacity:5;
-  z-index:1;
+  opacity: 1; /* Changed from 5 to 1 for valid opacity */
+  z-index: 1;
 }
 
 .nav-links {
   display: flex;
-  align-items: center; /* Ensure links are centered vertically */
-  gap: 20px; /* Space between links */
+  align-items: center;
+  gap: 20px;
+  z-index: 1; /* Ensure links are above background */
 }
 
 .nav-links a {
@@ -47,12 +48,83 @@
 }
 
 .nav-links a:hover {
-  color:#DAA520;
+  color: #DAA520;
 }
- 
 
 .logout-btn {
   cursor: pointer;
-  font-weight: 500;
-  background-color: none;
+  background: none;
+  border: none;
+  padding: 6px 10px;
+  color: #071739;
+  transition: color 0.3s ease;
+}
+
+.logout-btn:hover {
+  color: #DAA520;
+}
+
+.navbar-toggle {
+  display: none; /* Hidden on desktop */
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #071739;
+  cursor: pointer;
+  z-index: 1;
+}
+
+/* Mobile and Tablet Styles */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 8px 15px; /* Reduced padding for smaller screens */
+    flex-wrap: wrap; /* Allow wrapping if needed */
+  }
+
+  .aulogo {
+    height: 50px; /* Smaller logo on mobile */
+  }
+
+  .navbar-toggle {
+    display: block; /* Show hamburger menu */
+  }
+
+  .nav-links {
+    display: none; /* Hidden by default on mobile */
+    flex-direction: column; /* Stack links vertically */
+    width: 100%;
+    position: absolute;
+    top: 100%; /* Position below navbar */
+    left: 0;
+    background-color: #FFF9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    gap: 10px;
+  }
+
+  .nav-links.active {
+    display: flex; /* Show when active */
+  }
+
+  .nav-links a,
+  .logout-btn {
+    padding: 10px;
+    text-align: center;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .aulogo {
+    height: 40px; /* Even smaller logo for small screens */
+  }
+
+  .navbar {
+    padding: 8px 10px;
+  }
+
+  .nav-links a,
+  .logout-btn {
+    font-size: 0.9rem;
+  }
 }

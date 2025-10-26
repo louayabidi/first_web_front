@@ -1,36 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 import logo from "../assets/logo.png";
-import { AiOutlineLogout } from 'react-icons/ai';          
+import { AiOutlineLogout } from 'react-icons/ai';
 
 
 const Navbar = ({ isAdmin }) => {
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
-    window.location.reload(); // refresh state
+    window.location.reload(); // Refresh state
   };
 
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   return (
     <nav className="navbar">
       <img src={logo} alt="Logo" className="aulogo" />
 
-      <div className="nav-links">
-        <Link to="/">Accueil</Link>
-        <Link to="/about">À propos de moi</Link>
-        <Link to="/contact">Contactez-moi</Link>
+      <button className="navbar-toggle" onClick={toggleMenu}>
+        ☰
+      </button>
 
-        {isAdmin && <Link to="/dashboard">Dashboard</Link>}
+      <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
+        <Link to="/" onClick={() => setIsMenuOpen(false)}>Accueil</Link>
+        <Link to="/about" onClick={() => setIsMenuOpen(false)}>À propos de moi</Link>
+        <Link to="/contact" onClick={() => setIsMenuOpen(false)}>Contactez-moi</Link>
+
+        {isAdmin && (
+          <Link to="/admin" onClick={() => setIsMenuOpen(false)}>Dashboard</Link>
+        )}
 
         {!isLoggedIn ? (
-          <Link to="/login">Connexion</Link>
+          <Link to="/login" onClick={() => setIsMenuOpen(false)}>Connexion</Link>
         ) : (
-          <button className="logout-btn" onClick={handleLogout}>
+          <button className="logout-btn" onClick={() => { handleLogout(); setIsMenuOpen(false); }}>
             <AiOutlineLogout size={20} title="Logout" />
           </button>
         )}
