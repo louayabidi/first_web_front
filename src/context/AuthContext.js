@@ -1,5 +1,6 @@
-import React, { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { createContext, useState, useEffect } from "react";
+import axios from "axios";
+import API_BASE_URL from "../services/api";
 
 export const AuthContext = createContext();
 
@@ -8,40 +9,28 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
-      axios.get('http://localhost:5000/api/auth/me', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then(res => {
-          setUser(res.data.user);
-          setLoading(false);
-        })
-        .catch(() => {
-          localStorage.removeItem('token');
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
+      axios.get(`${API_BASE_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(res => { setUser(res.data.user); setLoading(false); })
+        .catch(() => { localStorage.removeItem("token"); setLoading(false); });
+    } else setLoading(false);
   }, []);
 
   const login = async (email, password) => {
-    const res = await axios.post('http://localhost:5000/api/login', { email, password });
-    localStorage.setItem('token', res.data.token);
+    const res = await axios.post(`${API_BASE_URL}/api/login`, { email, password });
+    localStorage.setItem("token", res.data.token);
     setUser(res.data.user);
   };
 
   const signup = async (name, email, password) => {
-    const res = await axios.post('http://localhost:5000/api/signup', { name, email, password });
-    localStorage.setItem('token', res.data.token);
+    const res = await axios.post(`${API_BASE_URL}/api/signup`, { name, email, password });
+    localStorage.setItem("token", res.data.token);
     setUser(res.data.user);
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('isAdmin');
-    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem("token");
     setUser(null);
   };
 

@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { ServiceContext } from '../context/ServiceContext';
 import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
+import API_BASE_URL from "../services/api";
 
 function AdminDashboard() {
   const { user, logout } = useContext(AuthContext);
@@ -31,7 +32,7 @@ function AdminDashboard() {
 
   const fetchServices = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/services', {
+      const res = await axios.get(`${API_BASE_URL}/api/services`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setServices(res.data.services);
@@ -66,7 +67,7 @@ function AdminDashboard() {
 
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/api/services/${editingId}`, formData, {
+        await axios.put(`${API_BASE_URL}/api/services/${editingId}`, formData,  {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'multipart/form-data',
@@ -74,7 +75,7 @@ function AdminDashboard() {
         });
         setSuccess('Service updated successfully!');
       } else {
-        await axios.post('http://localhost:5000/api/services', formData, {
+        await axios.post(`${API_BASE_URL}/api/services`, formData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'multipart/form-data',
@@ -106,7 +107,7 @@ function AdminDashboard() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/services/${id}`, {
+      await axios.delete(`${API_BASE_URL}/api/services/${id}`,  {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setSuccess('Service deleted successfully!');

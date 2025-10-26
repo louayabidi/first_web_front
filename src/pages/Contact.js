@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./Contact.css";
 import contactImg from "../assets/heropic.png";
+import API_BASE_URL from "../services/api";
+
 
 function Contact() {
   const [form, setForm] = useState({
@@ -55,7 +57,7 @@ function Contact() {
     setStatus("Sending...");
 
     try {
-      const res = await axios.post("http://localhost:5000/api/contact", form);
+      const res = await axios.post(`${API_BASE_URL}/api/contact`, form)
       if (res.data.success) {
         setStatus("✅ Message sent successfully!");
         setForm({
