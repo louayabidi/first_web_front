@@ -55,8 +55,8 @@ function Footer() {
             </li>
             <li>
               <FaEnvelope className="icon" />
-              <a href="mailto:sas.superstaff@gmail.com" aria-label="Email us">
-                sas.superstaff@gmail.com
+              <a href="mailto:superstaff@gmail.com" aria-label="Email us">
+               superstaff91@gmail.com
               </a>
             </li>
             <li>
