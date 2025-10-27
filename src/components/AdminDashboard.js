@@ -1,52 +1,57 @@
-import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
-import { AuthContext } from '../context/AuthContext';
-import { ServiceContext } from '../context/ServiceContext';
-import { useNavigate } from 'react-router-dom';
-import './AdminDashboard.css';
-import API_BASE_URL from "../services/api";
+import React, { useState, useEffect, useContext, useCallback } from "react";
+import axios from "axios";
+import { AuthContext } from "../context/AuthContext";
+import { ServiceContext } from "../context/ServiceContext";
+import { useNavigate } from "react-router-dom";
+import "./AdminDashboard.css";
 
 function AdminDashboard() {
   const { user, logout } = useContext(AuthContext);
   const { triggerRefresh } = useContext(ServiceContext);
   const navigate = useNavigate();
+
   const [services, setServices] = useState([]);
   const [form, setForm] = useState({
-    title: '',
-    description: '',
-    link: '',
+    title: "",
+    description: "",
+    link: "",
     image: null,
     isActive: true,
   });
   const [editingId, setEditingId] = useState(null);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  useEffect(() => {
-    if (!user || user.role !== 'admin') {
-      navigate('/login');
-    } else {
-      fetchServices();
-    }
-  }, [user, navigate]);
+  // ✅ Use environment variable for backend URL
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-  const fetchServices = async () => {
+  // ✅ Fetch services wrapped with useCallback to avoid dependency warnings
+  const fetchServices = useCallback(async () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/api/services`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setServices(res.data.services);
     } catch (err) {
-      setError('Failed to fetch services');
+      setError("Failed to fetch services");
       console.error(err);
     }
-  };
+  }, [API_BASE_URL]);
+
+  // ✅ useEffect calls fetchServices safely
+  useEffect(() => {
+    if (!user || user.role !== "admin") {
+      navigate("/login");
+    } else {
+      fetchServices();
+    }
+  }, [user, navigate, fetchServices]);
 
   const handleChange = (e) => {
     const { name, type, value, files, checked } = e.target;
-    if (type === 'file') {
+    if (type === "file") {
       setForm({ ...form, image: files[0] });
-    } else if (type === 'checkbox') {
+    } else if (type === "checkbox") {
       setForm({ ...form, isActive: checked });
     } else {
       setForm({ ...form, [name]: value });
@@ -55,41 +60,49 @@ function AdminDashboard() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     const formData = new FormData();
-    formData.append('title', form.title);
-    formData.append('description', form.description);
-    if (form.link) formData.append('link', form.link); 
-    formData.append('isActive', form.isActive);
-    if (form.image) formData.append('image', form.image);
+    formData.append("title", form.title);
+    formData.append("description", form.description);
+    if (form.link) formData.append("link", form.link);
+    formData.append("isActive", form.isActive);
+    if (form.image) formData.append("image", form.image);
 
     try {
       if (editingId) {
-        await axios.put(`${API_BASE_URL}/api/services/${editingId}`, formData,  {
+        await axios.put(`${API_BASE_URL}/api/services/${editingId}`, formData, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "multipart/form-data",
           },
         });
-        setSuccess('Service updated successfully!');
+        setSuccess("✅ Service updated successfully!");
       } else {
         await axios.post(`${API_BASE_URL}/api/services`, formData, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "multipart/form-data",
           },
         });
-        setSuccess('Service added successfully!');
+        setSuccess("✅ Service added successfully!");
       }
-      setForm({ title: '', description: '', link: '', image: null, isActive: true });
+
+      // Reset form and refresh data
+      setForm({
+        title: "",
+        description: "",
+        link: "",
+        image: null,
+        isActive: true,
+      });
       setEditingId(null);
-      document.getElementById('image-input').value = '';
+      document.getElementById("image-input").value = "";
       fetchServices();
       triggerRefresh();
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to save service');
+      setError(err.response?.data?.error || "Failed to save service");
       console.error(err);
     }
   };
@@ -98,7 +111,7 @@ function AdminDashboard() {
     setForm({
       title: service.title,
       description: service.description,
-      link: service.link,
+      link: service.link || "",
       image: null,
       isActive: service.isActive,
     });
@@ -107,14 +120,14 @@ function AdminDashboard() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API_BASE_URL}/api/services/${id}`,  {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      await axios.delete(`${API_BASE_URL}/api/services/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      setSuccess('Service deleted successfully!');
+      setSuccess("✅ Service deleted successfully!");
       fetchServices();
       triggerRefresh();
     } catch (err) {
-      setError('Failed to delete service');
+      setError("Failed to delete service");
       console.error(err);
     }
   };
@@ -126,32 +139,42 @@ function AdminDashboard() {
         <button onClick={logout}>Logout</button>
       </div>
 
-      <h2>{editingId ? 'Edit Service' : 'Add Service'}</h2>
+      <h2>{editingId ? "Edit Service" : "Add Service"}</h2>
       {error && <p className="error">{error}</p>}
       {success && <p className="success">{success}</p>}
 
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <label>
           Title
-          <input type="text" name="title" value={form.title} onChange={handleChange} required />
+          <input
+            type="text"
+            name="title"
+            value={form.title}
+            onChange={handleChange}
+            required
+          />
         </label>
 
         <label>
           Description
-          <textarea name="description" value={form.description} onChange={handleChange} required />
+          <textarea
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            required
+          />
         </label>
 
-       <label>
-  Link
-  <input
-    type="text"
-    name="link"
-    value={form.link}
-    onChange={handleChange}
-    placeholder="Optionnel"
-  />
-</label>
-
+        <label>
+          Link
+          <input
+            type="text"
+            name="link"
+            value={form.link}
+            onChange={handleChange}
+            placeholder="Optional"
+          />
+        </label>
 
         <label>
           Image
@@ -167,21 +190,31 @@ function AdminDashboard() {
 
         <label>
           Active
-          <input type="checkbox" name="isActive" checked={form.isActive} onChange={handleChange} />
+          <input
+            type="checkbox"
+            name="isActive"
+            checked={form.isActive}
+            onChange={handleChange}
+          />
         </label>
 
-        <button type="submit">{editingId ? 'Update' : 'Add'} Service</button>
+        <button type="submit">{editingId ? "Update" : "Add"} Service</button>
       </form>
 
       <h2>Services List</h2>
       <div className="services-list">
         {services.map((service) => (
           <div key={service._id} className="service-item">
-            <img src={`http://localhost:5000${service.image}`} alt={service.title} />
+            {service.image && (
+              <img
+                src={`${API_BASE_URL}${service.image}`}
+                alt={service.title}
+              />
+            )}
             <h3>{service.title}</h3>
             <p>{service.description}</p>
-            <p>Link: {service.link}</p>
-            <p>Status: {service.isActive ? 'Active' : 'Inactive'}</p>
+            {service.link && <p>Link: {service.link}</p>}
+            <p>Status: {service.isActive ? "Active" : "Inactive"}</p>
             <button onClick={() => handleEdit(service)}>Edit</button>
             <button onClick={() => handleDelete(service._id)}>Delete</button>
           </div>
