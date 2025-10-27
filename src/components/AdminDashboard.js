@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { ServiceContext } from "../context/ServiceContext";
 import { useNavigate } from "react-router-dom";
 import "./AdminDashboard.css";
+import API_BASE_URL from "../services/api"; 
 
 function AdminDashboard() {
   const { user, logout } = useContext(AuthContext);
@@ -22,10 +23,7 @@ function AdminDashboard() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // ✅ Use environment variable for backend URL
-  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
-  // ✅ Fetch services wrapped with useCallback to avoid dependency warnings
+  // ✅ Fetch services
   const fetchServices = useCallback(async () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/api/services`, {
@@ -36,9 +34,8 @@ function AdminDashboard() {
       setError("Failed to fetch services");
       console.error(err);
     }
-  }, [API_BASE_URL]);
+  }, []);
 
-  // ✅ useEffect calls fetchServices safely
   useEffect(() => {
     if (!user || user.role !== "admin") {
       navigate("/login");
@@ -67,7 +64,8 @@ function AdminDashboard() {
     formData.append("title", form.title);
     formData.append("description", form.description);
     if (form.link) formData.append("link", form.link);
-    formData.append("isActive", form.isActive);
+    // Send boolean as string to avoid backend issues
+    formData.append("isActive", form.isActive ? "true" : "false");
     if (form.image) formData.append("image", form.image);
 
     try {
@@ -89,14 +87,7 @@ function AdminDashboard() {
         setSuccess("✅ Service added successfully!");
       }
 
-      // Reset form and refresh data
-      setForm({
-        title: "",
-        description: "",
-        link: "",
-        image: null,
-        isActive: true,
-      });
+      setForm({ title: "", description: "", link: "", image: null, isActive: true });
       setEditingId(null);
       document.getElementById("image-input").value = "";
       fetchServices();
@@ -146,56 +137,27 @@ function AdminDashboard() {
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <label>
           Title
-          <input
-            type="text"
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            required
-          />
+          <input type="text" name="title" value={form.title} onChange={handleChange} required />
         </label>
 
         <label>
           Description
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            required
-          />
+          <textarea name="description" value={form.description} onChange={handleChange} required />
         </label>
 
         <label>
           Link
-          <input
-            type="text"
-            name="link"
-            value={form.link}
-            onChange={handleChange}
-            placeholder="Optional"
-          />
+          <input type="text" name="link" value={form.link} onChange={handleChange} placeholder="Optional" />
         </label>
 
         <label>
           Image
-          <input
-            id="image-input"
-            type="file"
-            name="image"
-            accept="image/*"
-            onChange={handleChange}
-            required={!editingId}
-          />
+          <input id="image-input" type="file" name="image" accept="image/*" onChange={handleChange} required={!editingId} />
         </label>
 
         <label>
           Active
-          <input
-            type="checkbox"
-            name="isActive"
-            checked={form.isActive}
-            onChange={handleChange}
-          />
+          <input type="checkbox" name="isActive" checked={form.isActive} onChange={handleChange} />
         </label>
 
         <button type="submit">{editingId ? "Update" : "Add"} Service</button>
@@ -205,12 +167,7 @@ function AdminDashboard() {
       <div className="services-list">
         {services.map((service) => (
           <div key={service._id} className="service-item">
-            {service.image && (
-              <img
-                src={`${API_BASE_URL}${service.image}`}
-                alt={service.title}
-              />
-            )}
+            {service.image && <img src={`${API_BASE_URL}${service.image}`} alt={service.title} />}
             <h3>{service.title}</h3>
             <p>{service.description}</p>
             {service.link && <p>Link: {service.link}</p>}
