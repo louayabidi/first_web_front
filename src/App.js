@@ -1,14 +1,22 @@
-
 import React, { useContext, Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthContext } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Loader from './components/Loader';
 
+
 // Lazy-loaded components
 const Navbar = lazy(() => import('./components/Navbar'));
 const Footer = lazy(() => import('./components/Footer'));
-
+const PlasteringDetail = lazy(() => import('./components/service_static/PlasteringDetail'));
+const Restauration = lazy(() => import('./components/service_static/Restauration'));
+const Facades = lazy(() => import('./components/service_static/Facades'));
+const Appartement = lazy(() => import('./components/service_static/Appartement'));
+const Luxury = lazy(() => import('./components/service_static/luxury'));
+const Galleries = lazy(() => import('./components/service_static/Galleries'));
+const Mesure = lazy(() => import('./components/service_static/Mesure'));
+const Design = lazy(() => import('./components/service_static/Design'));
+const FabricationGypsum = lazy(() => import('./components/service_static/FabricationGypsum'));
 const Home = lazy(() => import('./pages/Home'));
 const About = lazy(() => import('./pages/About'));
 const Contact = lazy(() => import('./pages/Contact'));
@@ -18,10 +26,6 @@ const Forgot = lazy(() => import('./pages/Forgot'));
 
 const Immeuble = lazy(() => import('./components/Immeuble'));
 const Professionel = lazy(() => import('./components/Professionel'));
-const Restauration = lazy(() => import('./components/Restauration'));
-const Facades = lazy(() => import('./components/Facades'));
-const Appartement = lazy(() => import('./components/Appartement'));
-const Fabrication = lazy(() => import('./components/Fabrication'));
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 
 const App = () => {
@@ -41,7 +45,15 @@ const App = () => {
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<AuthPage />} />
             <Route path="/forgot" element={<Forgot />} />
-
+            <Route path="/services/plastering" element={<PlasteringDetail />} />
+            <Route path="/services/restauration" element={<Restauration />} />  
+            <Route path="/services/Facades" element={<Facades />} /> 
+             <Route path="/services/Appartement" element={<Appartement />} /> 
+            <Route path="/services/Luxury" element={<Luxury />} />  
+            <Route path="/services/mesure" element={<Mesure />} />  
+            <Route path="/services/design" element={<Design />} /> 
+            <Route path="/services/Galleries" element={<Galleries />} />  
+            <Route path="/services/fabrication-gypsum" element={<FabricationGypsum />} />  
             <Route
               path="/admin"
               element={
@@ -62,8 +74,7 @@ const App = () => {
             <Route path="/professionel" element={<Professionel />} />
             <Route path="/restauration" element={<Restauration />} />
             <Route path="/appartement" element={<Appartement />} />
-            <Route path="/fabrication" element={<Fabrication />} />
-            <Route path="/facades" element={<Facades />} />
+           
           </Routes>
         </Suspense>
       </main>

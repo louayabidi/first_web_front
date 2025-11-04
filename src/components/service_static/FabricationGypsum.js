@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "./Facades.css";
-
-
+import "./FabricationGypsum.css";
 
 function GalleryCard({ images, onDelete }) {
   const [index, setIndex] = useState(0);
@@ -15,7 +13,7 @@ function GalleryCard({ images, onDelete }) {
   }, [images.length]);
 
   return (
-    <div className="gallry-card">
+    <div className="gallery-card">
       {images.map((img, i) => (
         <div
           key={img._id || img.id}
@@ -23,8 +21,8 @@ function GalleryCard({ images, onDelete }) {
         >
           <img
             src={img.url || img}
-            alt={`Façades ${i}`}
-            className="card-imag"
+            alt={`Fabrication Gypsum ${i}`}
+            className="card-image"
           />
           <button
             className="delete-btn"
@@ -38,22 +36,19 @@ function GalleryCard({ images, onDelete }) {
   );
 }
 
-function Facades() {
-  // 🧹 Default images removed
+function FabricationGypsum() {
   const [gallery, setGallery] = useState([]);
   const [backendGallery, setBackendGallery] = useState([]);
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/images/facades")
+      .get("http://localhost:5000/api/images/fabrication-gypsum")
       .then((res) => {
-        if (res.data.length > 0) {
-          const backendImgs = res.data.map((img) => ({
-            ...img,
-            url: `http://localhost:5000/uploads/${img.filename}`,
-          }));
-          setBackendGallery(backendImgs);
-        }
+        const backendImgs = res.data.map((img) => ({
+          ...img,
+          url: `http://localhost:5000/uploads/${img.filename}`,
+        }));
+        setBackendGallery(backendImgs);
       })
       .catch(() => {});
   }, []);
@@ -77,35 +72,32 @@ function Facades() {
   };
 
   return (
-    <section className="facades">
-      <div className="facades-header">
-        <h1>Façades et Extérieurs</h1>
+    <section className="fabrication-gypsum">
+      <div className="fabrication-gypsum-header">
+        <h1>Fabrication Gypsum</h1>
         <p>
-          Sublimez l’extérieur de vos bâtiments avec des façades élégantes et durables. 
-          Nous associons design, savoir-faire et matériaux de qualité pour offrir une finition 
-          esthétique et résistante aux intempéries.
+          Nous fabriquons des produits en gypsum sur mesure avec une qualité supérieure.
         </p>
       </div>
 
-      <div className="facades-details">
-        <h2>Nos services pour les façades</h2>
+      <div className="fabrication-gypsum-details">
+        <h2>Nos services de fabrication</h2>
         <ul>
-          <li>Conception et habillage décoratif de façades</li>
-          <li>Rénovation complète des extérieurs</li>
-          <li>Travaux d’enduits et finitions haut de gamme</li>
-          <li>Création d’ornements architecturaux personnalisés</li>
-          <li>Isolation et protection contre l’humidité</li>
-          <li>Peinture, patine et restauration de façades anciennes</li>
+          <li>Fabrication de moulures</li>
+          <li>Production personnalisée</li>
+          <li>Assemblage professionnel</li>
+          <li>Contrôle qualité</li>
+          <li>Matériaux durables</li>
+          <li>Projets à grande échelle</li>
         </ul>
       </div>
 
-      <div className="facades-gallery">
-        <h2>Galerie des Façades</h2>
-        <div className="gallry-grid">
+      <div className="fabrication-gypsum-gallery">
+        <h2>Galerie de Fabrication</h2>
+        <div className="gallery-grid">
           {gallery.map((group, i) => (
             <GalleryCard key={`default-${i}`} images={group} onDelete={handleDelete} />
           ))}
-
           {backendGallery.map((img) => (
             <GalleryCard key={img._id} images={[img]} onDelete={handleDelete} />
           ))}
@@ -115,4 +107,4 @@ function Facades() {
   );
 }
 
-export default Facades;
+export default FabricationGypsum;

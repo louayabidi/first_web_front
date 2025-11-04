@@ -1,0 +1,97 @@
+.fabrication-gypsum {
+  padding: 100px 30px;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+.fabrication-gypsum-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.fabrication-gypsum-header h1 {
+  font-size: 36px;
+  color: #071739;
+}
+
+.fabrication-gypsum-header p {
+  font-size: 18px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.fabrication-gypsum-details {
+  margin-bottom: 50px;
+}
+
+.fabrication-gypsum-details h2 {
+  font-size: 28px;
+  color: #071739;
+  margin-bottom: 20px;
+}
+
+.fabrication-gypsum-details ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.fabrication-gypsum-details li {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.fabrication-gypsum-gallery {
+  text-align: center;
+}
+
+.fabrication-gypsum-gallery h2 {
+  font-size: 28px;
+  color: #071739;
+  margin-bottom: 30px;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.gallery-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.5s ease;
+}
+
+.card-wrapper.hidden {
+  opacity: 0;
+}
+
+.card-wrapper.active {
+  opacity: 1;
+}
+
+.card-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 0, 0, 0.7);
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+}

@@ -4,7 +4,6 @@ import "./Navbar.css";
 import logo from "../assets/logo.png";
 import { AiOutlineLogout } from 'react-icons/ai';
 
-
 const Navbar = ({ isAdmin }) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,6 +32,7 @@ const Navbar = ({ isAdmin }) => {
         <Link to="/" onClick={() => setIsMenuOpen(false)}>Accueil</Link>
         <Link to="/about" onClick={() => setIsMenuOpen(false)}>À propos de moi</Link>
         <Link to="/contact" onClick={() => setIsMenuOpen(false)}>Contactez-moi</Link>
+         <Link to="services/Galleries" onClick={() => setIsMenuOpen(false)}>Art</Link>
 
         {isAdmin && (
           <Link to="/admin" onClick={() => setIsMenuOpen(false)}>Dashboard</Link>

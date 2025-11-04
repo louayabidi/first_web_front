@@ -35,7 +35,7 @@ function Hero() {
       ></div>
       <div className="hero-overlay">
         <div className="hero-text container">
-          <h1>Créations Gypsum Élégantes</h1>
+          <h1>Super Staff</h1>
           <p>
             Nous proposons des solutions complètes en staff et plâtre décoratif,
             alliant élégance, modernité et savoir-faire artisanal. Qu’il s’agisse

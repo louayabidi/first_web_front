@@ -96,7 +96,7 @@
     position: absolute;
     top: 100%; /* Position below navbar */
     left: 0;
-    background-color: #FFF9;
+    background-color: #E8940E; /* Darker background for mobile menu */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 1rem;
     gap: 10px;
@@ -106,11 +106,26 @@
     display: flex; /* Show when active */
   }
 
-  .nav-links a,
-  .logout-btn {
+  .nav-links a {
+    color: #FFFFFF; /* White text for better contrast on dark background */
     padding: 10px;
     text-align: center;
     font-size: 1rem;
+  }
+
+  .nav-links a:hover {
+    color: #DAA520; /* Keep hover color */
+  }
+
+  .logout-btn {
+    color: #FFFFFF; /* White icon for logout */
+    padding: 10px;
+    text-align: center;
+    font-size: 1rem;
+  }
+
+  .logout-btn:hover {
+    color: #DAA520;
   }
 }
 
