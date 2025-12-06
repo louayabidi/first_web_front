@@ -18,6 +18,18 @@ const Navbar = ({ isAdmin }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMenuOpen]);
+
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
@@ -28,6 +40,10 @@ const Navbar = ({ isAdmin }) => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
   };
 
   const navLinks = [
@@ -56,7 +72,7 @@ const Navbar = ({ isAdmin }) => {
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-3 group">
+            <Link to="/" className="flex items-center gap-3 group" onClick={closeMenu}>
               <motion.img
                 src={logo}
                 alt="Logo"
@@ -118,68 +134,139 @@ const Navbar = ({ isAdmin }) => {
             <motion.button
               onClick={toggleMenu}
               whileTap={{ scale: 0.9 }}
-              className="lg:hidden p-2 text-white hover:text-amber-400 transition-colors"
+              className="lg:hidden p-2 text-white hover:text-amber-400 transition-colors z-50 relative"
               aria-label="Toggle menu"
             >
-              {isMenuOpen ? <FaTimes size={28} /> : <FaBars size={28} />}
+              <AnimatePresence mode="wait">
+                {isMenuOpen ? (
+                  <motion.div
+                    key="close"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <FaTimes size={28} />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="open"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <FaBars size={28} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu Overlay - Full Screen */}
         <AnimatePresence>
           {isMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="lg:hidden bg-black/98 backdrop-blur-md border-t border-white/10"
-            >
-              <div className="max-w-7xl mx-auto px-4 py-6 space-y-4">
-                {navLinks.map((link, index) => (
-                  <motion.div
-                    key={link.to}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <Link
-                      to={link.to}
-                      onClick={() => setIsMenuOpen(false)}
-                      className="block px-4 py-3 text-white hover:text-amber-400 hover:bg-white/5 rounded-lg transition-all font-medium"
-                    >
-                      {link.label}
-                    </Link>
-                  </motion.div>
-                ))}
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="fixed inset-0 bg-black/80 backdrop-blur-sm lg:hidden z-40"
+                onClick={closeMenu}
+              />
 
-                <div className="pt-4 border-t border-white/10">
-                  {!isLoggedIn ? (
-                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                      <motion.button
-                        whileTap={{ scale: 0.95 }}
-                        className="w-full px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all shadow-lg"
-                      >
-                        Connexion
-                      </motion.button>
-                    </Link>
-                  ) : (
-                    <motion.button
-                      onClick={() => {
-                        handleLogout();
-                        setIsMenuOpen(false);
-                      }}
-                      whileTap={{ scale: 0.95 }}
-                      className="w-full px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg transition-all shadow-lg flex items-center justify-center gap-2"
+              {/* Menu Content */}
+              <motion.div
+                initial={{ opacity: 0, x: '100%' }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: '100%' }}
+                transition={{ type: 'tween', duration: 0.3 }}
+                className="fixed top-20 right-0 bottom-0 w-full sm:w-80 bg-black lg:hidden z-40 overflow-y-auto"
+                style={{
+                  boxShadow: '-10px 0 30px rgba(0, 0, 0, 0.5)'
+                }}
+              >
+                {/* Decorative gradient border */}
+                <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 via-amber-500 to-amber-600" />
+
+                <div className="p-6 space-y-2">
+                  {/* Navigation Links */}
+                  {navLinks.map((link, index) => (
+                    <motion.div
+                      key={link.to}
+                      initial={{ opacity: 0, x: 50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
                     >
-                      <AiOutlineLogout size={20} />
-                      Déconnexion
-                    </motion.button>
-                  )}
+                      <Link
+                        to={link.to}
+                        onClick={closeMenu}
+                        className="block px-6 py-4 text-white hover:text-amber-400 hover:bg-white/5 rounded-xl transition-all font-semibold text-lg border border-transparent hover:border-amber-500/30"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span>{link.label}</span>
+                          <span className="text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  ))}
+
+                  {/* Divider */}
+                  <motion.div
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="my-6 h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent"
+                  />
+
+                  {/* Auth Button */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    {!isLoggedIn ? (
+                      <Link to="/login" onClick={closeMenu}>
+                        <motion.button
+                          whileTap={{ scale: 0.95 }}
+                          className="w-full px-6 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all shadow-lg hover:shadow-amber-500/50"
+                        >
+                          Connexion
+                        </motion.button>
+                      </Link>
+                    ) : (
+                      <motion.button
+                        onClick={() => {
+                          handleLogout();
+                          closeMenu();
+                        }}
+                        whileTap={{ scale: 0.95 }}
+                        className="w-full px-6 py-4 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-red-500/50 flex items-center justify-center gap-2"
+                      >
+                        <AiOutlineLogout size={20} />
+                        <span>Déconnexion</span>
+                      </motion.button>
+                    )}
+                  </motion.div>
+
+                  {/* Footer Info */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="mt-8 pt-6 border-t border-white/10"
+                  >
+                    <div className="text-center text-gray-400 text-sm">
+                      <p className="font-semibold text-amber-400 mb-1">SUPERSTAFF</p>
+                      <p>Excellence depuis 2010</p>
+                    </div>
+                  </motion.div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
       </motion.nav>
