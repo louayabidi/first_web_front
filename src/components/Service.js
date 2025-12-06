@@ -1,16 +1,16 @@
-import React, { useRef, useEffect, useContext } from "react";
+import React, { useRef, useEffect, useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
 import { motion, useAnimation } from "framer-motion";
 import { ServiceContext } from "../context/ServiceContext";
 import API_BASE_URL from "../services/api";
-import plasteringImage from '../assets/restauration1.1.jpg';
-import luxury1 from '../assets/luxury1.jpg';
-import professionel from '../assets/professionel2.jpg';
-import mesureImage from '../assets/mesure1.jpg';
-import gypsumbImage from '../assets/gypsumb.jpg';
-import Appartement from '../assets/Appartement1.jpg';
-import Facades from '../assets/facade1.jpg';
+import plasteringImage from "../assets/restauration1.1.jpg";
+import luxury1 from "../assets/luxury1.jpg";
+import professionel from "../assets/professionel2.jpg";
+import mesureImage from "../assets/mesure1.jpg";
+import gypsumbImage from "../assets/gypsumb.jpg";
+import Appartement from "../assets/Appartement1.jpg";
+import Facades from "../assets/facade1.jpg";
 import "./Service.css";
 
 function Service() {
@@ -18,108 +18,76 @@ function Service() {
   const controls = useAnimation();
   const speedRef = useRef(10);
   const positionRef = useRef(0);
+  const [isDragging, setIsDragging] = useState(false);
 
-  // Define static services here (basic services). Replace with your actual service details, images, and links.
-  // Images can be hosted in the public folder (e.g., /images/plastering.jpg) or external URLs.
-  // Links point to detail pages you need to create separately (e.g., in your router: <Route path="/services/plastering" component={PlasteringDetail} />)
   const staticServices = [
-    {
-      title: "Plastering",
-      image: plasteringImage, 
-      link: "/services/plastering",
-      isStatic: true,
-    },
-    {
-      title: "Restauration",
-      image: professionel, 
-      link: "/services/restauration",
-      isStatic: true,
-    },
-    {
-      title: "Luxury",
-      image: luxury1, // Replace with actual image path
-      link: "/services/Luxury",
-      isStatic: true,
-    },
-    {
-      title: "Appartement",
-      image: Appartement, 
-      link: "/services/Appartement",
-      isStatic: true,
-    },
-    {
-      title: "SurMesure",
-      image: mesureImage, 
-      link: "/services/mesure",
-      isStatic: true,
-    },
-    {
-      title: "Design",
-      image: gypsumbImage, 
-      link: "/services/design",
-      isStatic: true,
-    },
- 
-
-     {
-      title: "Facades",
-      image: Facades, 
-      link: "/services/Facades",
-      isStatic: true,
-    },
-    // Add more static services as needed
+    { title: "Plastering", image: plasteringImage, link: "/services/plastering", isStatic: true },
+    { title: "Restauration", image: professionel, link: "/services/restauration", isStatic: true },
+    { title: "Luxury", image: luxury1, link: "/services/Luxury", isStatic: true },
+    { title: "Appartement", image: Appartement, link: "/services/Appartement", isStatic: true },
+    { title: "SurMesure", image: mesureImage, link: "/services/mesure", isStatic: true },
+    { title: "Design", image: gypsumbImage, link: "/services/design", isStatic: true },
+    { title: "Facades", image: Facades, link: "/services/Facades", isStatic: true },
   ];
 
   const allServices = [...staticServices, ...dynamicServices];
 
   useEffect(() => {
-  let frame;
-  let mounted = true;
+    let frame;
+    let mounted = true;
 
-  const move = () => {
-    if (!mounted) return;
-    positionRef.current -= speedRef.current / 100;
-    if (positionRef.current <= -100) positionRef.current = 0;
+    const move = () => {
+      if (!mounted || isDragging) return;
+      positionRef.current -= speedRef.current / 100;
+      if (positionRef.current <= -100) positionRef.current = 0;
 
-    // ✅ Vérifie que le composant est bien monté avant d’appeler start()
-    controls.start({
-      x: `${positionRef.current}%`,
-      transition: { ease: "linear", duration: 0 },
-    }).catch(() => {}); // évite erreur si démonté pendant un frame
+      controls.start({
+        x: `${positionRef.current}%`,
+        transition: { ease: "linear", duration: 0 },
+      }).catch(() => {});
 
-    frame = requestAnimationFrame(move);
-  };
+      frame = requestAnimationFrame(move);
+    };
 
-  // ✅ Démarre l’animation après le premier rendu
-  const timeout = setTimeout(() => {
-    frame = requestAnimationFrame(move);
-  }, 0);
+    const timeout = setTimeout(() => {
+      frame = requestAnimationFrame(move);
+    }, 0);
 
-  const handleKeyDown = (e) => {
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft") speedRef.current = 40;
-  };
-  const handleKeyUp = (e) => {
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft") speedRef.current = 10;
-  };
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") speedRef.current = 40;
+    };
+    const handleKeyUp = (e) => {
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") speedRef.current = 10;
+    };
 
-  window.addEventListener("keydown", handleKeyDown);
-  window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 
-  return () => {
-    mounted = false;
-    cancelAnimationFrame(frame);
-    clearTimeout(timeout);
-    window.removeEventListener("keydown", handleKeyDown);
-    window.removeEventListener("keyup", handleKeyUp);
-  };
-}, [controls]);
+    return () => {
+      mounted = false;
+      cancelAnimationFrame(frame);
+      clearTimeout(timeout);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [controls, isDragging]);
 
   return (
     <section className="services" id="services">
       <h2 className="services-title">Nos services Gypsum</h2>
       {error && <p className="error">{error}</p>}
+
       <div className="carousel-wrapper">
-        <motion.div className="services-carousel" animate={controls}>
+        <motion.div
+          className="services-carousel"
+          animate={controls}
+          drag="x"
+          dragConstraints={{ left: -allServices.length * 270, right: 0 }} // 270 = width+gap
+          dragElastic={0.2}
+          onDragStart={() => setIsDragging(true)}
+          onDragEnd={() => setIsDragging(false)}
+          whileTap={{ cursor: "grabbing" }}
+        >
           {[...allServices, ...allServices].map((item, index) => (
             <div key={index} className="service-card">
               <Link to={item.link || "#"} className="service-card-link">
