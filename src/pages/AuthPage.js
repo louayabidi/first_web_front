@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import './Auth.css';
+import './Auth.css'; // You can keep or remove if not needed
 import logo from '../assets/logo.png';
 
 const AuthPage = () => {
@@ -19,23 +19,23 @@ const AuthPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.email || !form.password || (!isLogin && !form.name)) {
-      setStatus('❌ Veuillez remplir tous les champs obligatoires.');
+    if (!form.email || !form.email || !form.password || (!isLogin && !form.name)) {
+      setStatus('Veuillez remplir tous les champs obligatoires.');
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email)) {
-      setStatus('❌ Format d’email invalide.');
+      setStatus('Format d’email invalide.');
       return;
     }
 
     if (form.password.length < 6) {
-      setStatus('❌ Le mot de passe doit contenir au moins 6 caractères.');
+      setStatus('Le mot de passe doit contenir au moins 6 caractères.');
       return;
     }
 
-    setStatus('🔄 Traitement en cours...');
+    setStatus('Traitement en cours...');
 
     try {
       if (isLogin) {
@@ -43,90 +43,105 @@ const AuthPage = () => {
         navigate(form.email === process.env.REACT_APP_ADMIN_EMAIL ? '/admin' : '/');
       } else {
         await signup(form.name, form.email, form.password);
-        setIsLogin(true); // Switch to login after signup
+        setIsLogin(true);
       }
 
       setForm({ name: '', email: '', password: '' });
-      setStatus('✅ Success');
+      setStatus('Succès !');
     } catch (error) {
-      const errMsg = error.response?.data?.error || 'Une erreur s’est produite. Veuillez réessayer.';
-      setStatus('❌ ' + errMsg);
+      const errMsg = error.response?.data?.error || 'Une erreur s’est produite.';
+      setStatus(errMsg);
     }
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <img src={logo} alt="Logo" className="auth-logo" />
-        <h1>{isLogin ? 'Se connecter' : 'S’inscrire'}</h1>
-
-        <form onSubmit={handleSubmit}>
-          {!isLogin && (
-            <input
-              type="text"
-              name="name"
-              placeholder="Nom"
-              value={form.name}
-              onChange={handleChange}
-              required
-            />
-          )}
-
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-
-          <div className="password-field">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              name="password"
-              placeholder="Mot de passe"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-            <span
-              className="toggle-password"
-              onClick={() => setShowPassword(!showPassword)}
-              title={showPassword ? 'Hide Password' : 'Show Password'}
-              style={{ cursor: 'pointer' }}
-            >
-              {showPassword ? '🙈' : '👁️'}
-            </span>
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 border border-amber-200">
+          <div className="text-center mb-8">
+            <img src={logo} alt="Logo" className="h-20 mx-auto mb-4" />
+            <h1 className="text-3xl font-bold text-gray-800">
+              {isLogin ? 'Connexion' : 'Inscription'}
+            </h1>
           </div>
 
-          {isLogin && (
-            <div className="forgot-password">
-              <span
-                onClick={() => navigate('/forgot')}
-                className="toggle-link"
-                style={{ cursor: 'pointer' }}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {!isLogin && (
+              <input
+                type="text"
+                name="name"
+                placeholder="Votre nom"
+                value={form.name}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition"
+              />
+            )}
+
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition"
+            />
+
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                placeholder="Mot de passe"
+                value={form.password}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition"
+              />
+              <button
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-amber-600"
               >
-                Mot de passe oublié ?
-              </span>
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
             </div>
+
+            {isLogin && (
+              <div className="text-right">
+                <span
+                  onClick={() => navigate('/forgot')}
+                  className="text-amber-600 hover:text-amber-700 text-sm font-medium cursor-pointer"
+                >
+                  Mot de passe oublié ?
+                </span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-xl hover:from-amber-600 hover:to-amber-700 transition shadow-lg"
+            >
+              {isLogin ? 'Se connecter' : 'Créer un compte'}
+            </button>
+          </form>
+
+          {status && (
+            <p className={`mt-4 text-center font-medium ${status.includes('Succès') ? 'text-green-600' : 'text-red-600'}`}>
+              `}>
+              {status}
+            </p>
           )}
 
-          <button type="submit">{isLogin ? 'Connexion' : 'S’inscrire'}</button>
-        </form>
-
-        {status && <p className="status-message">{status}</p>}
-
-        <p>
-          {isLogin ? 'Vous n’avez pas de compte ?' : 'Vous avez déjà un compte ?'}{' '}
-          <span
-            onClick={() => setIsLogin(!isLogin)}
-            className="toggle-link"
-            style={{ cursor: 'pointer' }}
-          >
-            {isLogin ? 'S’inscrire' : 'Connexion'}
-          </span>
-        </p>
+          <p className="text-center mt-6 text-gray-600">
+            {isLogin ? "Pas encore de compte ?" : "Déjà un compte ?"}{' '}
+            <span
+              onClick={() => setIsLogin(!isLogin)}
+              className="text-amber-600 font-bold cursor-pointer hover:underline"
+            >
+              {isLogin ? 'S’inscrire' : 'Se connecter'}
+            </span>
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -7,12 +7,7 @@ import API_BASE_URL from "../services/api";
 
 function Contact() {
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    postalCode: "",
-    objectif: "",
-    message: "",
+    name: "", email: "", phone: "", postalCode: "", objectif: "", message: ""
   });
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("");
@@ -21,38 +16,33 @@ function Contact() {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
 
-  // Real-time validation
   const validateField = (name, value) => {
-    const errors = {};
-    if (name === "name" && !value.trim()) errors.name = "Le nom est requis";
-    if (name === "email" && !/^\S+@\S+\.\S+$/.test(value))
-      errors.email = "Format d'email invalide";
-    if (name === "phone" && !/^\+?\d{10,}$/.test(value.replace(/\s/g, "")))
-      errors.phone = "Numéro de téléphone invalide";
-    if (name === "postalCode" && !value.trim())
-      errors.postalCode = "Code postal requis";
-    if (name === "objectif" && !value.trim())
-      errors.objectif = "Objectif requis";
-    if (name === "message" && !value.trim())
-      errors.message = "Message requis";
-    return errors;
+    const newErrors = {};
+    if (name === "name" && !value.trim()) newErrors.name = "Le nom est requis";
+    if (name === "email" && !/^\S+@\S+\.\S+$/.test(value)) newErrors.email = "Email invalide";
+    if (name === "phone" && value && !/^\+?\d{8,15}$/.test(value.replace(/\s/g, ""))) 
+      newErrors.phone = "Numéro invalide";
+    if (name === "postalCode" && !value.trim()) newErrors.postalCode = "Code postal requis";
+    if (name === "objectif" && !value.trim()) newErrors.objectif = "Objectif requis";
+    if (name === "message" && !value.trim()) newErrors.message = "Message requis";
+    return newErrors;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-    setErrors({ ...errors, ...validateField(name, value) });
+    setForm(prev => ({ ...prev, [name]: value }));
+    setErrors(prev => ({ ...prev, ...validateField(name, value) }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formErrors = Object.keys(form).reduce((acc, key) => {
-      return { ...acc, ...validateField(key, form[key]) };
-    }, {});
-    
+    const formErrors = Object.keys(form).reduce((acc, key) => ({
+      ...acc, ...validateField(key, form[key])
+    }), {});
+
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
-      setStatus("⚠️ Veuillez corriger les erreurs dans le formulaire.");
+      setStatus("Veuillez corriger les erreurs");
       return;
     }
 
@@ -60,321 +50,146 @@ function Contact() {
     setStatus("Envoi en cours...");
 
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/contact`, form);
-      if (res.data.success) {
-        setStatus("✅ Message envoyé avec succès!");
-        setForm({
-          name: "",
-          email: "",
-          phone: "",
-          postalCode: "",
-          objectif: "",
-          message: "",
-        });
-        setErrors({});
-      } else {
-        setStatus("❌ Échec de l'envoi du message.");
-      }
+      await axios.post(`${API_BASE_URL}/api/contact`, form);
+      setStatus("Message envoyé avec succès !");
+      setForm({ name: "", email: "", phone: "", postalCode: "", objectif: "", message: "" });
+      setErrors({});
     } catch (err) {
-      setStatus("⚠️ Erreur lors de l'envoi du message.");
+      setStatus("Erreur lors de l'envoi");
     } finally {
       setLoading(false);
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.3
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut" }
-    }
-  };
-
   const inputFields = [
-    { name: "name", label: "Nom Complet", type: "text", icon: <FaUser />, placeholder: "Jean Dupont" },
-    { name: "email", label: "E-mail", type: "email", icon: <FaEnvelope />, placeholder: "exemple@gmail.com" },
-    { name: "phone", label: "Numéro de Téléphone", type: "tel", icon: <FaPhone />, placeholder: "+216 12 345 678" },
-    { name: "postalCode", label: "Code Postal", type: "text", icon: <FaMapMarkerAlt />, placeholder: "75000" },
-    { name: "objectif", label: "Objectif", type: "text", icon: <FaBullseye />, placeholder: "Rénovation, Design..." },
+    { name: "name", label: "Nom Complet", icon: <FaUser />, placeholder: "Jean Dupont" },
+    { name: "email", label: "E-mail", icon: <FaEnvelope />, placeholder: "exemple@gmail.com" },
+    { name: "phone", label: "Téléphone", icon: <FaPhone />, placeholder: "+216 12 345 678" },
+    { name: "postalCode", label: "Code Postal", icon: <FaMapMarkerAlt />, placeholder: "75000" },
+    { name: "objectif", label: "Objectif du projet", icon: <FaBullseye />, placeholder: "Rénovation, décoration..." },
   ];
 
   return (
-    <section 
-      ref={sectionRef}
-      className="relative py-24 md:py-32 overflow-hidden bg-black min-h-screen flex items-center"
-      aria-labelledby="contact-heading"
-    >
-      {/* Animated Grid Background */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `
-            linear-gradient(rgba(218, 165, 32, 0.2) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(218, 165, 32, 0.2) 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px',
-        }} />
-      </div>
+    <section ref={sectionRef} className="py-20 bg-gradient-to-b from-white to-amber-50">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
 
-      {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-amber-900/20" />
-
-      {/* Floating Particles */}
-      {[...Array(15)].map((_, i) => (
+        {/* Header */}
         <motion.div
-          key={i}
-          className="absolute w-2 h-2 bg-amber-400 rounded-full opacity-20"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
-          animate={{
-            y: [0, -50, 0],
-            opacity: [0.1, 0.4, 0.1],
-            scale: [1, 1.3, 1],
-          }}
-          transition={{
-            duration: 4 + Math.random() * 3,
-            repeat: Infinity,
-            delay: Math.random() * 2,
-          }}
-        />
-      ))}
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 w-full">
-        {/* Section Header */}
-        <motion.div
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          variants={containerVariants}
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
           className="text-center mb-16"
         >
-          <motion.div
-            variants={itemVariants}
-            className="inline-flex items-center gap-2 px-6 py-2 bg-amber-500/20 backdrop-blur-md border border-amber-400/30 rounded-full mb-6"
-          >
-            <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
-            <span className="text-amber-300 text-sm font-medium tracking-wider uppercase">
-              Contactez-Nous
-            </span>
-          </motion.div>
-
-          <motion.h1 
-            id="contact-heading"
-            variants={itemVariants}
-            className="text-5xl md:text-7xl font-black mb-6"
-            style={{
-              background: 'linear-gradient(135deg, #fff 0%, #fbbf24 50%, #f59e0b 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-          >
+          <span className="inline-block px-4 py-2 bg-amber-100 text-amber-800 rounded-full text-sm font-semibold mb-4">
+            Contactez-nous
+          </span>
+          <h1 className="text-5xl md:text-6xl font-black text-gray-800 mb-6">
             DONNONS VIE À VOTRE PROJET
-          </motion.h1>
-
-          <motion.p
-            variants={itemVariants}
-            className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto"
-          >
-            Partagez votre vision et transformons-la en réalité
-          </motion.p>
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Partagez votre vision, nous la réalisons avec passion et expertise
+          </p>
         </motion.div>
 
-        {/* Main Content */}
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-          {/* Image Section */}
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Image */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8 }}
-            className="relative order-2 lg:order-1"
           >
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              {/* Glow Effect */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-amber-600 to-amber-400 rounded-2xl blur-xl opacity-50" />
-              
-              <div className="relative">
-                <img
-                  src={contactImg}
-                  alt="Inspiration décor en gypse"
-                  loading="lazy"
-                  className="w-full h-[500px] object-cover rounded-2xl border border-amber-500/30"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent rounded-2xl" />
-                
-                {/* Overlay Text */}
-                <div className="absolute bottom-0 left-0 right-0 p-8">
-                  <h3 className="text-3xl font-bold text-white mb-2">Excellence & Passion</h3>
-                  <p className="text-gray-200">20+ années de savoir-faire artisanal</p>
-                </div>
+            <div className="rounded-2xl overflow-hidden shadow-2xl border border-amber-200">
+              <img
+                src={contactImg}
+                alt="Décoration intérieure"
+                className="w-full h-96 object-cover"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-6 mt-8">
+              <div className="bg-amber-50 p-6 rounded-xl text-center border border-amber-200">
+                <div className="text-4xl font-black text-amber-600">500+</div>
+                <p className="text-gray-700 font-medium">Projets réalisés</p>
+              </div>
+              <div className="bg-amber-50 p-6 rounded-xl text-center border border-amber-200">
+                <div className="text-4xl font-black text-amber-600">100%</div>
+                <p className="text-gray-700 font-medium">Clients satisfaits</p>
               </div>
             </div>
-
-            {/* Info Cards */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.6 }}
-              className="mt-8 grid grid-cols-2 gap-4"
-            >
-              <div className="bg-gray-900/50 backdrop-blur-sm border border-amber-500/20 rounded-xl p-4 text-center">
-                <div className="text-3xl font-black text-amber-400 mb-1">500+</div>
-                <div className="text-sm text-gray-300">Projets Réalisés</div>
-              </div>
-              <div className="bg-gray-900/50 backdrop-blur-sm border border-amber-500/20 rounded-xl p-4 text-center">
-                <div className="text-3xl font-black text-amber-400 mb-1">100%</div>
-                <div className="text-sm text-gray-300">Satisfaction</div>
-              </div>
-            </motion.div>
           </motion.div>
 
-          {/* Form Section */}
+          {/* Form */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8 }}
-            className="order-1 lg:order-2"
+            className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-200"
           >
-            <div className="bg-gray-900/50 backdrop-blur-sm border border-amber-500/20 rounded-2xl p-8 shadow-2xl">
-              <form onSubmit={handleSubmit} noValidate>
-                <motion.div
-                  initial="hidden"
-                  animate={isInView ? "visible" : "hidden"}
-                  variants={containerVariants}
-                  className="space-y-6"
-                >
-                  {/* Input Fields */}
-                  {inputFields.map((field, index) => (
-                    <motion.div key={field.name} variants={itemVariants}>
-                      <label htmlFor={field.name} className="block text-sm font-semibold text-gray-300 mb-2">
-                        {field.label}
-                      </label>
-                      <div className="relative">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-400">
-                          {field.icon}
-                        </div>
-                        <input
-                          id={field.name}
-                          type={field.type}
-                          name={field.name}
-                          placeholder={field.placeholder}
-                          value={form[field.name]}
-                          onChange={handleChange}
-                          required
-                          aria-invalid={!!errors[field.name]}
-                          aria-describedby={errors[field.name] ? `${field.name}-error` : undefined}
-                          className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all"
-                        />
-                      </div>
-                      {errors[field.name] && (
-                        <motion.span 
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          id={`${field.name}-error`} 
-                          className="text-red-400 text-sm mt-1 block"
-                        >
-                          {errors[field.name]}
-                        </motion.span>
-                      )}
-                    </motion.div>
-                  ))}
-
-                  {/* Message Field */}
-                  <motion.div variants={itemVariants}>
-                    <label htmlFor="message" className="block text-sm font-semibold text-gray-300 mb-2">
-                      Message
-                    </label>
-                    <div className="relative">
-                      <div className="absolute left-4 top-4 text-amber-400">
-                        <FaComments />
-                      </div>
-                      <textarea
-                        id="message"
-                        name="message"
-                        placeholder="Décrivez votre projet en détail..."
-                        rows="5"
-                        value={form.message}
-                        onChange={handleChange}
-                        required
-                        aria-invalid={!!errors.message}
-                        aria-describedby={errors.message ? "message-error" : undefined}
-                        className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all resize-none"
-                      />
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {inputFields.map(field => (
+                <div key={field.name}>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    {field.label} {field.name !== "phone" && "*"}
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center text-amber-600">
+                      {field.icon}
                     </div>
-                    {errors.message && (
-                      <motion.span 
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        id="message-error" 
-                        className="text-red-400 text-sm mt-1 block"
-                      >
-                        {errors.message}
-                      </motion.span>
-                    )}
-                  </motion.div>
-
-                  {/* Submit Button */}
-                  <motion.div variants={itemVariants}>
-                    <motion.button
-                      type="submit"
-                      disabled={loading}
-                      aria-busy={loading}
-                      whileHover={{ scale: loading ? 1 : 1.02 }}
-                      whileTap={{ scale: loading ? 1 : 0.98 }}
-                      className="group relative w-full"
-                    >
-                      <div className="absolute -inset-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition duration-500 group-disabled:opacity-50" />
-                      <button 
-                        className="relative w-full px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-lg font-bold rounded-2xl shadow-2xl flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
-                        disabled={loading}
-                      >
-                        {loading ? (
-                          <>
-                            <motion.div
-                              animate={{ rotate: 360 }}
-                              transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                            />
-                            <span>Envoi en cours...</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>Envoyer le Message</span>
-                            <FaPaperPlane className="text-sm" />
-                          </>
-                        )}
-                      </button>
-                    </motion.button>
-                  </motion.div>
-
-                  {/* Status Message */}
-                  {status && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`p-4 rounded-xl text-center font-semibold ${
-                        status.includes("✅") 
-                          ? "bg-green-500/20 border border-green-500/50 text-green-300" 
-                          : "bg-red-500/20 border border-red-500/50 text-red-300"
-                      }`}
-                    >
-                      {status}
-                    </motion.div>
+                    <input
+                      type={field.name === "email" ? "email" : "text"}
+                      name={field.name}
+                      placeholder={field.placeholder}
+                      value={form[field.name]}
+                      onChange={handleChange}
+                      required={field.name !== "phone"}
+                      className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition"
+                    />
+                  </div>
+                  {errors[field.name] && (
+                    <span className="text-red-600 text-sm mt-1">{errors[field.name]}</span>
                   )}
-                </motion.div>
-              </form>
-            </div>
+                </div>
+              ))}
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Message *</label>
+                <div className="relative">
+                  <div className="absolute top-4 left- left-4 text-amber-600"><FaComments /></div>
+                  <textarea
+                    name="message"
+                    rows="5"
+                    placeholder="Décrivez votre projet..."
+                    value={form.message}
+                    onChange={handleChange}
+                    required
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 resize-none"
+                  />
+                </div>
+                {errors.message && <span className="text-red-600 text-sm">{errors.message}</span>}
+              </div>
+
+              <motion.button
+                type="submit"
+                disabled={loading}
+                whileHover={{ scale: loading ? 1 : 1.02 }}
+                whileTap={{ scale: loading ? 1 : 0.98 }}
+                className="w-full py- py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-3"
+              >
+                {loading ? (
+                  <>Envoi en cours...</>
+                ) : (
+                  <>
+                    Envoyer le Message <FaPaperPlane />
+                  </>
+                )}
+              </motion.button>
+
+              {status && (
+                <div className={`p-4 rounded-xl text-center font-medium ${
+                  status.includes("succès") ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                }`}>
+                  {status}
+                </div>
+              )}
+            </form>
           </motion.div>
         </div>
       </div>

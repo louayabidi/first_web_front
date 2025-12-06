@@ -6,7 +6,7 @@ import { ServiceContext } from "../context/ServiceContext";
 import API_BASE_URL from "../services/api";
 
 // Import your actual images
-import plasteringImage from "../assets/restauration1.1.jpg";
+
 import luxury1 from "../assets/luxury1.jpg";
 import professionel from "../assets/professionel2.jpg";
 import mesureImage from "../assets/mesure1.jpg";
@@ -26,13 +26,7 @@ function Service() {
   const [isPaused, setIsPaused] = useState(false);
 
   const staticServices = [
-    { 
-      title: "Plastering", 
-      image: plasteringImage, 
-      link: "/services/plastering", 
-      isStatic: true,
-      description: "Finitions parfaites et professionnelles"
-    },
+ 
     { 
       title: "Restauration", 
       image: professionel, 
@@ -80,36 +74,47 @@ function Service() {
   const allServices = [...staticServices, ...dynamicServices];
 
   // Auto-scroll effect
-  useEffect(() => {
-    let frame;
-    let mounted = true;
+  // Dans Service.jsx, remplacez le useEffect de l'auto-scroll par ceci :
 
-    const move = () => {
-      if (!mounted || isDragging || isPaused) return;
-      
-      positionRef.current -= speedRef.current / 100;
-      
-      // Reset position for infinite loop
-      if (positionRef.current <= -100) {
-        positionRef.current = 0;
-      }
+useEffect(() => {
+  let frame;
+  let mounted = true;
+  let autoScrollTimeout;
 
-      controls.set({
-        x: `${positionRef.current}%`,
-      });
+  const move = () => {
+    if (!mounted || isDragging || isPaused) return;
+    
+    positionRef.current -= speedRef.current / 100;
+    
+    // Reset position for infinite loop
+    if (positionRef.current <= -100) {
+      positionRef.current = 0;
+    }
 
-      frame = requestAnimationFrame(move);
-    };
+    controls.set({
+      x: `${positionRef.current}%`,
+    });
 
     frame = requestAnimationFrame(move);
+  };
 
-    return () => {
-      mounted = false;
-      if (frame) {
-        cancelAnimationFrame(frame);
-      }
-    };
-  }, [controls, isDragging, isPaused]);
+  // ✨ Auto-scroll seulement pendant 10 secondes au début
+  autoScrollTimeout = setTimeout(() => {
+    setIsPaused(true); // Arrête l'auto-scroll après 10 secondes
+  }, 10000);
+
+  frame = requestAnimationFrame(move);
+
+  return () => {
+    mounted = false;
+    if (frame) {
+      cancelAnimationFrame(frame);
+    }
+    if (autoScrollTimeout) {
+      clearTimeout(autoScrollTimeout);
+    }
+  };
+}, [controls, isDragging, isPaused]);
 
   // Manual scroll with arrows
   const scroll = (direction) => {

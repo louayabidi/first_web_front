@@ -8,7 +8,7 @@ import Loader from './components/Loader';
 // Lazy-loaded components
 const Navbar = lazy(() => import('./components/Navbar'));
 const Footer = lazy(() => import('./components/Footer'));
-const PlasteringDetail = lazy(() => import('./components/service_static/PlasteringDetail'));
+
 const Restauration = lazy(() => import('./components/service_static/Restauration'));
 const Facades = lazy(() => import('./components/service_static/Facades'));
 const Appartement = lazy(() => import('./components/service_static/Appartement'));
@@ -45,7 +45,7 @@ const App = () => {
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<AuthPage />} />
             <Route path="/forgot" element={<Forgot />} />
-            <Route path="/services/plastering" element={<PlasteringDetail />} />
+      
             <Route path="/services/restauration" element={<Restauration />} />  
             <Route path="/services/Facades" element={<Facades />} /> 
              <Route path="/services/Appartement" element={<Appartement />} /> 
